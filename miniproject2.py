@@ -1,6 +1,7 @@
+import sys
 import nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, RegexpTokenizer
+from nltk.tokenize import RegexpTokenizer
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -14,7 +15,7 @@ def preprocess_text(text):
     # Convert to lowercase
     text = text.lower()
 
-    # Tokenize text with a more refined tokenizer that excludes punctuation
+    # Tokenize text with a refined tokenizer that excludes punctuation
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(text)
 
@@ -31,7 +32,7 @@ def get_sbert_embeddings(sentences):
     return np.array(embeddings)
 
 # Evaluate Answers using cosine similarity and scaled scores
-def evaluate_answers(answer_sheet, evaluation_sheet, marks):
+def evaluate_answers(answer_sheet, evaluation_sheet, marks=100):
     # Preprocess the answer sheet and evaluation sheet
     answer_sheet_processed = [preprocess_text(answer) for answer in answer_sheet]
     evaluation_sheet_processed = [preprocess_text(evaluation) for evaluation in evaluation_sheet]
@@ -58,15 +59,21 @@ def evaluate_answers(answer_sheet, evaluation_sheet, marks):
 
     return average_score
 
-# Example input
-answer_sheet = [
-    "The quick brown fox jumps over the lazy dog."
-]
-evaluation_sheet = [
-    "A quick brown fox leaped over a lazy dog."
-]
-marks = 100
+if __name__ == "__main__":
+    # Read input text from command-line arguments
+    if len(sys.argv) < 3:
+        print("Usage: python miniproject2.py '<answer_text>' '<evaluation_text>'")
+        sys.exit(1)
 
-# Evaluate the answers and get an aggregated score
-average_score = evaluate_answers(answer_sheet, evaluation_sheet, marks)
-print(f"Average Score: {average_score}")
+    # First argument is answer text, second argument is evaluation text
+    answer_text = sys.argv[1]
+    evaluation_text = sys.argv[2]
+
+    # Evaluate the answer and return the score
+    answer_sheet = [answer_text]
+    evaluation_sheet = [evaluation_text]
+    marks = 100
+
+    # Get the score
+    average_score = evaluate_answers(answer_sheet, evaluation_sheet, marks)
+    print(average_score)

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>smart Evaluator</title>
+  <link rel="stylesheet" href="sty.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <h1>Smart Evaluator</h1>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <p>Select two images to evaluate:</p>
+    <div class="file-inputs">
+      <input type="file" id="image-input1" accept="image/*" />
+      <input type="file" id="image-input2" accept="image/*" />
+    </div>
+    <button id="evaluate-button" class="btn">Evaluate</button>
+
+    <div class="output-container">
+      <h3>Text from Image 1:</h3>
+      <div id="output1" class="output-box">Extracted text will appear here.</div>
+      <h3>Text from Image 2:</h3>
+      <div id="output2" class="output-box">Extracted text will appear here.</div>
+      <h3>Evaluation Score:</h3>
+      <div id="evaluation-score" class="output-box">Evaluation score will appear here.</div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2025 Image to Text Evaluator. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('evaluate-button').addEventListener('click', async function () {
+      const file1 = document.getElementById('image-input1').files[0];
+      const file2 = document.getElementById('image-input2').files[0];
+
+      if (!file1 || !file2) {
+        alert('Please select both images.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image1', file1);
+      formData.append('image2', file2);
+
+      try {
+        const response = await fetch('/evaluate', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        document.getElementById('output1').innerText = result.text1 || 'No text detected in Image 1';
+        document.getElementById('output2').innerText = result.text2 || 'No text detected in Image 2';
+        document.getElementById('evaluation-score').innerText = result.score !== undefined 
+          ? `Similarity Score: ${result.score}` 
+          : 'Evaluation failed.';
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to evaluate. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
