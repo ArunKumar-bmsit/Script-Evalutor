@@ -1150,6 +1150,7 @@ function getFallbackResources(topic) {
 }
 
 // Serve static files like CSS, JS, etc.
+app.use(express.static(path.join(__dirname)));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
